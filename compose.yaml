@@ -1,0 +1,82 @@
+# compose.yaml
+version: '3.8'
+
+services:
+  # ==========================================================
+  # NODO MATRIZ (ASUNCIÓN)
+  # ==========================================================
+  postgres-matriz:
+    image: postgres:15-alpine
+    container_name: cpd-matriz-db
+    networks:
+      - red_empresarial
+    ports:
+      - "5432:5432" # Puerto PostgreSQL estándar para el host físico
+    environment:
+      POSTGRES_DB: matriz_db
+      POSTGRES_USER: ucom_admin
+      POSTGRES_PASSWORD: password_matriz
+    volumes:
+      - datos_matriz:/var/lib/postgresql/data
+
+  # ==========================================================
+  # NODO SUCURSAL A (CIUDAD DEL ESTE)
+  # ==========================================================
+  postgres-sucursal-a:
+    image: postgres:15-alpine
+    container_name: cpd-sucursala-db
+    networks:
+      - red_empresarial
+    ports:
+      - "5433:5432" # Redireccionamos el puerto 5433 del host al 5432 interno
+    environment:
+      POSTGRES_DB: sucursal_a_db
+      POSTGRES_USER: ucom_admin
+      POSTGRES_PASSWORD: password_sucursal_a
+    volumes:
+      - datos_sucursal_a:/var/lib/postgresql/data
+
+  # ==========================================================
+  # NODO SUCURSAL B (ENCARNACIÓN)
+  # ==========================================================
+  postgres-sucursal-b:
+    image: postgres:15-alpine
+    container_name: cpd-sucursalb-db
+    networks:
+      - red_empresarial
+    ports:
+      - "5434:5432" # Redireccionamos el puerto 5434 del host al 5432 interno
+    environment:
+      POSTGRES_DB: sucursal_b_db
+      POSTGRES_USER: ucom_admin
+      POSTGRES_PASSWORD: password_sucursal_b
+    volumes:
+      - datos_sucursal_b:/var/lib/postgresql/data
+
+  # ==========================================================
+  # NODO SUCURSAL C (CORONEL OVIEDO)
+  # ==========================================================
+  postgres-sucursal-c:
+    image: postgres:15-alpine
+    container_name: cpd-sucursalc-db
+    networks:
+      - red_empresarial
+    ports:
+      - "5435:5432" # Redireccionamos el puerto 5435 del host al 5432 interno
+    environment:
+      POSTGRES_DB: sucursal_c_db
+      POSTGRES_USER: ucom_admin
+      POSTGRES_PASSWORD: password_sucursal_c
+    volumes:
+      - datos_sucursal_c:/var/lib/postgresql/data
+
+# Definición de la Red y Sistemas de Almacenamiento Lógicos
+networks:
+  red_empresarial:
+    driver: bridge # Creamos un conmutador de red (switch virtual) personalizado
+
+volumes:
+  datos_matriz:
+  datos_sucursal_a:
+  datos_sucursal_b:
+  datos_sucursal_c:
