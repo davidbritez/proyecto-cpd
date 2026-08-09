@@ -1,0 +1,5 @@
+# Ignorar la carpeta completa donde se guardan los datos de PostgreSQL
+almacenamiento/
+# Ignorar archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
