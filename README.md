@@ -27,3 +27,8 @@ El sistema se compone de las siguientes capas lógicas ejecutadas sobre un únic
 * **Balanceador de Carga:** Nginx / HA-Proxy
 * **Observabilidad:** Prometheus + Grafana Open Source
 * **Control de Versiones:** Git + GitHub
+
+
+
+# Ejemplo de commit
+en este apartado hice un cambio en el readme para demostrar como funciona el commit
