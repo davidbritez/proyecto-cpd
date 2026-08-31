@@ -22,6 +22,9 @@ Abre tu archivo `compose.yaml` en **VS Code** y añade la directiva `deploy.reso
 version: '3.8'
 
 services:
+  # ==========================================================
+  # NODO MATRIZ (ASUNCIÓN)
+  # ==========================================================
   postgres-matriz:
     image: postgres:15-alpine
     container_name: cpd-matriz-db
@@ -34,10 +37,10 @@ services:
     networks:
       - red_empresarial
     volumes:
-      - matriz_data:/var/lib/postgresql/data
-    # ==========================================================================
+      - datos_matriz:/var/lib/postgresql/data
+    # ==========================================================
     # LIMITACIÓN FÍSICA CGROUPS V2 (Novedad Clase 9)
-    # ==========================================================================
+    # ==========================================================
     deploy:
       resources:
         limits:
@@ -46,7 +49,10 @@ services:
         reservations:
           memory: 256M        # Reserva garantizada de 256 MB de RAM física para este motor
 
-  cpd-sucursala-db:
+  # ==========================================================
+  # NODO SUCURSAL A (CIUDAD DEL ESTE)
+  # ==========================================================
+  postgres-sucursal-a:
     image: postgres:15-alpine
     container_name: cpd-sucursala-db
     ports:
@@ -58,7 +64,10 @@ services:
     networks:
       - red_empresarial
     volumes:
-      - sucursala_data:/var/lib/postgresql/data
+      - datos_sucursal_a:/var/lib/postgresql/data
+    # ==========================================================
+    # LIMITACIÓN FÍSICA CGROUPS V2 (Novedad Clase 9)
+    # ==========================================================
     deploy:
       resources:
         limits:
@@ -67,13 +76,17 @@ services:
         reservations:
           memory: 128M        # Garantía mínima de 128 MB de RAM
 
+  # (Repetir la sección 'deploy' idéntica en 'postgres-sucursal-b' y 'postgres-sucursal-c' para gobernarlos de la misma manera)
+
 networks:
   red_empresarial:
     driver: bridge
 
 volumes:
-  matriz_data:
-  sucursala_data:
+  datos_matriz:
+  datos_sucursal_a:
+  datos_sucursal_b:
+  datos_sucursal_c:
 ```
 
 ---
