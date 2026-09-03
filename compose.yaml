@@ -10,15 +10,25 @@ services:
     container_name: cpd-matriz-db
     networks:
       - red_empresarial
-    ports:
-      - "5432:5432" # Puerto PostgreSQL estándar para el host físico
+    #ports:
+    #  - "5432:5432" # Puerto PostgreSQL estándar para el host físico
     environment:
       POSTGRES_DB: matriz_db
       POSTGRES_USER: ucom_admin
-      POSTGRES_PASSWORD: password_matriz
+      #POSTGRES_PASSWORD: password_matriz
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     volumes:
       - datos_matriz:/var/lib/postgresql/data
-
+    secrets:
+      - db_password
+    # Gobernanza Cgroups v2: límites físicos de silicio
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'        # Máximo 50% de un núcleo de CPU
+          memory: 512M        # Evita consumos mayores a 512 Megabytes de RAM
+        reservations:
+          memory: 256M        # Reserva mínima de 256 MB de RAM garantizada
   # ==========================================================
   # NODO SUCURSAL A (CIUDAD DEL ESTE)
   # ==========================================================
@@ -35,7 +45,13 @@ services:
       POSTGRES_PASSWORD: password_sucursal_a
     volumes:
       - datos_sucursal_a:/var/lib/postgresql/data
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'        # Límite estricto de 255% de CPU
+          memory: 256M        # Máximo de 256 MB de RAM
+        reservations:
+          memory: 128M        # Garantía mínima de 128 MB
   # ==========================================================
   # NODO SUCURSAL B (ENCARNACIÓN)
   # ==========================================================
@@ -52,7 +68,13 @@ services:
       POSTGRES_PASSWORD: password_sucursal_b
     volumes:
       - datos_sucursal_b:/var/lib/postgresql/data
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          memory: 128M
   # ==========================================================
   # NODO SUCURSAL C (CORONEL OVIEDO)
   # ==========================================================
@@ -69,7 +91,27 @@ services:
       POSTGRES_PASSWORD: password_sucursal_c
     volumes:
       - datos_sucursal_c:/var/lib/postgresql/data
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          memory: 128M
+# ==========================================================
+  # BALANCEADOR DE CARGA TCP (HA-PROXY CAPA 4 EN EL BORDE)
+  # ==========================================================
+  cpd-balanceador:
+    image: haproxy:2.8-alpine
+    container_name: cpd-balanceador
+    ports:
+      - "5432:5432"          # Único puerto expuesto en el host para canalizar el tráfico a la Matriz
+    networks:
+      - red_empresarial
+    volumes:
+      - ./balanceador/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - postgres-matriz
 # Definición de la Red y Sistemas de Almacenamiento Lógicos
 networks:
   red_empresarial:
@@ -80,3 +122,7 @@ volumes:
   datos_sucursal_a:
   datos_sucursal_b:
   datos_sucursal_c:
+# Declaración del Secret local
+secrets:
+  db_password:
+    file: ./db_password.txt
