@@ -1,0 +1,17 @@
+# monitoreo/prometheus.yml
+# Configuración global del motor de Telemetría del CPD de la UCOM
+
+global:
+  scrape_interval: 5s     # Intervalo de raspado rápido de métricas para laboratorios de clases
+  evaluation_interval: 5s # Evaluación de expresiones y alertas matemáticas en caliente
+
+scrape_configs:
+  # 1. Auto-monitoreo de la salud interna de Prometheus
+  - job_name: 'prometheus_sistema'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Monitoreo de las transacciones de las sucursales de Python
+  - job_name: 'simulador_ventas'
+    static_configs:
+      - targets: ['host.docker.internal:8000'] # Apunta directamente al puerto expuesto de Codespaces
