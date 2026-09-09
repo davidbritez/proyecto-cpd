@@ -34,8 +34,13 @@ git branch
 ```
 
 ---
+crear la estructa de la base de datos antes de correr el codigo de python del siguiente paso:
+```bash
+docker exec -i cpd-matriz-db psql -U ucom_admin -d matriz_db < ddl-v3.sql
+```
 
 ## 📁 PASO 2: EL SIMULADOR DE PRODUCCIÓN (`importar_ventas_v4.py`)
+
 
 El dataset masivo **`online_retail_II.csv`** posee variaciones en el nombre y tipo de sus columnas respecto a nuestras muestras controladas de prueba. Utilizaremos **Pandas** para procesar la información de forma eficiente y la biblioteca oficial **`prometheus_client`** para exponer métricas en el puerto **`8000`** en un hilo paralelo.
 
