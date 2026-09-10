@@ -4,5 +4,3 @@ almacenamiento/
 .DS_Store
 Thumbs.db
 almacenamiento/
-db_password.txt
-.env

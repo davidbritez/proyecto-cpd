@@ -98,7 +98,7 @@ services:
           memory: 256M
         reservations:
           memory: 128M
-# ==========================================================
+  # ==========================================================
   # BALANCEADOR DE CARGA TCP (HA-PROXY CAPA 4 EN EL BORDE)
   # ==========================================================
   cpd-balanceador:
@@ -112,6 +112,40 @@ services:
       - ./balanceador/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
       - postgres-matriz
+  # ==========================================================
+  # TELEMETRÍA: PROMETHEUS (TSDB)
+  # ==========================================================
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: cpd-prometheus
+    ports:
+      - "9090:9090" # Exponemos la consola web de Prometheus
+    networks:
+      - red_empresarial
+    volumes:
+      - ./monitoreo/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - datos_prometheus:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Permite a Prometheus salir a escuchar al Host de Codespaces
+    depends_on:
+      - postgres-matriz
+
+  # ==========================================================
+  # VISUALIZACIÓN: GRAFANA
+  # ==========================================================
+  grafana:
+    image: grafana/grafana-oss:10.0.3
+    container_name: cpd-grafana
+    ports:
+      - "3000:3000" # Exponemos el panel gráfico al puerto del Host
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Credenciales de acceso rápido para el alumno
+    networks:
+      - red_empresarial
+    volumes:
+      - datos_grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
 # Definición de la Red y Sistemas de Almacenamiento Lógicos
 networks:
   red_empresarial:
@@ -122,6 +156,8 @@ volumes:
   datos_sucursal_a:
   datos_sucursal_b:
   datos_sucursal_c:
+  datos_prometheus:
+  datos_grafana:
 # Declaración del Secret local
 secrets:
   db_password:

@@ -1,0 +1,18 @@
+# monitoreo/prometheus.yml
+# Configuración global del motor de Telemetría del CPD de la UCOM
+
+global:
+  scrape_interval: 5s     # Intervalo de raspado rápido de métricas para laboratorios de clase
+  evaluation_interval: 5s # Evaluación de expresiones matemáticas en caliente
+
+scrape_configs:
+  # 1. Monitoreo del propio motor de Prometheus
+  - job_name: 'prometheus_sistema'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Raspado de las métricas de las sucursales (Script de Python)
+  - job_name: 'simulador_ventas'
+    static_configs:
+      # Apuntamos explícitamente a la IP del Gateway de la subred de Codespaces
+      - targets: ['172.18.0.1:8000', 'host.docker.internal:8000']
